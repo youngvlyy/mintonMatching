@@ -103,7 +103,8 @@ const Main = () => {
             </div>
 
             {/* 방 리스트 */}
-            <div className="space-y-2">
+            <div className="max-h-[370px] overflow-y-auto">
+                <div className="space-y-2">
                 {filteredRooms.length === 0 && (
                     <p className="text-center text-sm text-gray-400 py-10">
                         생성된 방이 없습니다
@@ -123,6 +124,7 @@ const Main = () => {
                         </span>
                     </div>
                 ))}
+                </div>
             </div>
 
             {/* 방 생성 버튼 */}
