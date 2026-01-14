@@ -1,0 +1,153 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import MakeRoom from "./MakeRoom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { socket } from "../util/socket";
+
+interface Room {
+    _id: string;
+    title: string;
+    favorite: boolean;
+}
+const Main = () => {
+    const navigate = useNavigate();
+    const [rooms, setRooms] = useState<Room[]>([]);
+    const [search, setSearch] = useState("");
+    const [openPopup, setOpenPopup] = useState(false);
+    const [searchparams] = useSearchParams();//쿼리스트링
+    const userid = searchparams.get("user");//유저 쿼리스트링
+
+
+    //db에서 room 정보 불러오고 리스트에 뿌리기
+    useEffect(() => {
+        socket.connect();
+        axios.get("api/room")
+            .then(res => {
+
+                setRooms(res.data);
+                console.log(res.data);
+
+            })
+            .catch(err => console.log(err));
+    }, []);
+
+
+    const logout = () => {
+        localStorage.removeItem("token");
+        window.location.reload();
+    };
+
+    //방 추가 함수
+    const addRoom = async (tit: string) => {
+        const res = await axios.post("/api/room", {
+            title: tit
+        });
+        //room menu
+        setRooms(prev => [
+            ...prev,
+            {
+                _id: res.data._id,
+                title: res.data.title,
+                favorite: false
+            }
+        ]);
+
+        //room 실체 생성
+        // const roomin = await axios.post(`api/room/${res.data._id}`);
+
+        console.log(res.data);
+    };
+
+    //방으로 들어가기
+    const inRoom = (id: string, tit: string) => {
+        navigate(`/gameroom/${id}/${tit}?user=${userid}`);
+    }
+
+    // 검색된 방만 표시
+    const filteredRooms = rooms.filter(room =>
+        room.title.toLowerCase().includes(search.toLowerCase())
+    );
+
+    return (
+        <div className="max-w-xl mx-auto min-h-screen bg-gray-50 px-4 py-6">
+            {/* 헤더 */}
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-xl font-semibold text-gray-900">
+                    배드민턴 방 목록
+                </h1>
+                <div className="flex gap-2">
+                    <button className="px-3 py-1.5 text-sm border border-gray-300
+                                   rounded-lg hover:bg-gray-100 transition">
+                        마이페이지
+                    </button>
+                    <button
+                        onClick={logout}
+                        className="px-3 py-1.5 text-sm border border-red-300
+                               text-red-500 rounded-lg hover:bg-red-50 transition"
+                    >
+                        로그아웃
+                    </button>
+                </div>
+            </div>
+
+            {/* 검색 */}
+            <div className="mb-5">
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="방 제목 검색"
+                    className="w-full px-4 py-3 text-sm rounded-xl border border-gray-300
+                           focus:outline-none focus:ring-1 focus:ring-blue-400"
+                />
+            </div>
+
+            {/* 방 리스트 */}
+            <div className="space-y-2">
+                {filteredRooms.length === 0 && (
+                    <p className="text-center text-sm text-gray-400 py-10">
+                        생성된 방이 없습니다
+                    </p>
+                )}
+
+                {filteredRooms.map((room) => (
+                    <div
+                        key={room._id}
+                        onClick={() => inRoom(room._id, room.title)}
+                        className="flex justify-between items-center px-4 py-4
+                               bg-white border border-gray-200 rounded-xl
+                               hover:bg-gray-50 transition cursor-pointer"
+                    >
+                        <span className="text-gray-800 font-medium truncate">
+                            {room.title}
+                        </span>
+                    </div>
+                ))}
+            </div>
+
+            {/* 방 생성 버튼 */}
+            <button
+                onClick={() => setOpenPopup(true)}
+                className="fixed bottom-6 w-14 h-14 rounded-full
+             flex items-center justify-center
+             text-purple-500 border font-bold border-purple-500 leading-none text-3xl shadow-md
+             hover:bg-purple-600 transition"
+            >
+                +
+            </button>
+
+
+            {openPopup && (
+                <MakeRoom
+                    close={() => setOpenPopup(false)}
+                    addRoom={(tit) => addRoom(tit)}
+                />
+            )}
+        </div>
+    );
+
+
+
+};
+
+export default Main;
