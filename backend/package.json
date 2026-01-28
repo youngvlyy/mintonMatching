@@ -21,6 +21,7 @@
     "mongodb": "^7.0.0",
     "mongoose": "^8.20.1",
     "redis": "^5.10.0",
+    "redis-cli": "^2.1.2",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {

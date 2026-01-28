@@ -79,6 +79,22 @@ router.post("/room", async (req, res) => {
 
 });
 
+//방 삭제
+router.delete("/remove/:roomid", async (req, res) => {
+    const { roomid } = req.params;
+
+    try {
+        //user 정보 탐색
+        await Room.findByIdAndDelete(roomid);
+        return res.json({ success: true });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "서버 오류" });
+    }
+});
+
+
 //방 정보 얻기(id, title, favorite)
 router.get("/room", async (req, res) => {
 

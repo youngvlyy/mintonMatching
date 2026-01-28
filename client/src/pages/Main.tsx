@@ -7,7 +7,6 @@ import { socket } from "../util/socket";
 interface Room {
     _id: string;
     title: string;
-    favorite: boolean;
 }
 const Main = () => {
     const navigate = useNavigate();
@@ -20,16 +19,31 @@ const Main = () => {
 
     //db에서 room 정보 불러오고 리스트에 뿌리기
     useEffect(() => {
+    // 소켓 연결 (중복 방지)
+    if (!socket.connected) {
         socket.connect();
-        axios.get("api/room")
-            .then(res => {
+    }
 
+    const fetchRooms = () => {
+        axios.get("/api/room")
+            .then(res => {
                 setRooms(res.data);
                 console.log(res.data);
-
             })
             .catch(err => console.log(err));
-    }, []);
+    };
+
+    // 최초 로딩
+    fetchRooms();
+
+    // 서버에서 방 변경 알림
+    socket.on("roomupdate", fetchRooms);
+
+    return () => {
+        socket.off("roomupdate", fetchRooms);
+    };
+}, []);
+
 
 
     const logout = () => {
@@ -47,15 +61,15 @@ const Main = () => {
             ...prev,
             {
                 _id: res.data._id,
-                title: res.data.title,
-                favorite: false
+                title: res.data.title
             }
         ]);
+        console.log("res.data",res.data);
 
-        //room 실체 생성
-        // const roomin = await axios.post(`api/room/${res.data._id}`);
+        socket.emit("makeRoom");
 
-        console.log(res.data);
+        return res.data;
+
     };
 
     //방으로 들어가기
@@ -103,7 +117,7 @@ const Main = () => {
             </div>
 
             {/* 방 리스트 */}
-            <div className="max-h-[370px] overflow-y-auto">
+            <div className="max-h-[450px] overflow-y-auto">
                 <div className="space-y-2">
                 {filteredRooms.length === 0 && (
                     <p className="text-center text-sm text-gray-400 py-10">
@@ -143,6 +157,7 @@ const Main = () => {
                 <MakeRoom
                     close={() => setOpenPopup(false)}
                     addRoom={(tit) => addRoom(tit)}
+                    inRoom ={(id,tit)=> inRoom(id,tit)}
                 />
             )}
         </div>

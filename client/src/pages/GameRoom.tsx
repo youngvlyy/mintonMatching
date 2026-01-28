@@ -19,10 +19,11 @@ export default function GameRoom() {
     const [resting, setResting] = useState<Player[]>([]);
     const [ready, setReady] = useState<Player[] | null>(null);
     const [isAlreadyReady, setisAlreadyReady] = useState(false);
-
+    const [matchingcount, setMatchingcount] = useState(0);
 
     // 샘플 참가자
     const [players, setPlayers] = useState<Player[]>([]);
+
 
     //소켓 연결 함수
     const onConnect = () => {
@@ -51,40 +52,50 @@ export default function GameRoom() {
         });
 
         //서버에서 퇴장자 수신
-        socket.on("outupdatePlayer", (players) => {
+        socket.on("outupdatePlayer", async (players) => {
             setPlayers(players);
         });
 
         //readyplayer 화면에 뿌려주기
+        socket.on("isready", (isready) => {
+            setisAlreadyReady(isready === "1");
+        });
+
         socket.on("readyPlayers", (readyPlayers) => {
             setReady(readyPlayers);
         });
-        socket.on("initreadyPlayers", ({ readyPlayers, isready }) => {
+        socket.on("initreadyPlayers", ({ readyPlayers, f }) => {
             setReady(readyPlayers);
-            setisAlreadyReady(isready);
+            setisAlreadyReady(f);
         });
 
 
-        socket.on("matchingPlayers", ({ courts, resting }) => {
-            setCourts(courts);
-            setResting(resting);
+        socket.on("matchingPlayers", (matching) => {
+            setCourts(matching.courts);
+            setResting(matching.resting);
+            setMatchingcount(matching.matchingcount);
+            console.log("matchingcount", matchingcount);
         });
-
         socket.on("matchingAlert", (message) => {
             alert(message);
         });
+
 
         // 새로고침 / 탭 닫기
         window.addEventListener("beforeunload", handleUnload);
 
         return () => {
-            //페이지가 사라질때 clean up
+            socket.off("connect", onConnect);
             socket.off("inupdatePlayers");
             socket.off("outupdatePlayer");
             socket.off("readyPlayers");
             socket.off("matchingPlayers");
+            socket.off("matchingAlert");
+            socket.off("initreadyPlayers");
         };
+
     }, [roomid, userid]);
+
 
     const exit = () => {
         socket.emit("leaveRoom", roomid, userid);
@@ -101,68 +112,140 @@ export default function GameRoom() {
         return arr;
     }
 
+    //이중배열 셔플
+    function shuffle2A<T>(array: T[][], groupSize: number): T[][] {
+        const flat = shuffle(array.flat());
+        const result: T[][] = [];
 
+        for (let i = 0; i < flat.length; i += groupSize) {
+            result.push(flat.slice(i, i + groupSize));
+        }
+
+        return result;
+    }
+
+    let noReady: Player[] = [...players.filter(p => ready?.some(r => p.userid !== r.userid))];
 
     //매칭 함수
     const matchPlayers = (players: Player[], courtCount: number) => {
-        let males = [...players.filter((p) => p.gender === "M")];
-        let females = [...players.filter((p) => p.gender === "F")];
-
+        //전에 쉬었던 사람 중 ready 한 사람 
+        let restReady: Player[] = [...players.filter(p =>
+            resting.some(r => p.userid === r.userid)
+        )];
         //인원수가 모자르면 stop
-        if (males.length + females.length < 4) {
+        if (players.length < 4) {
             alert("ready인원수 모자람");
             return;
         }
 
-        //배열 섞기
+        //화면에 뿌려짐 배열 초기화
+        let newCourts: Player[][] = [];
+
+
+        console.log("restReady", restReady);
+
+        //전에 안 친사람들만 모아둠
+        let rmales = [...players.filter((p) => p.gender === "M" && restReady.some(r => r.userid === p.userid))];
+        let rfemales = [...players.filter((p) => p.gender === "F" && restReady.some(r => r.userid === p.userid))];
+
+        //전에 친 사람들
+        let males = [...players.filter((p) => p.gender === "M" && !restReady.some(r => r.userid === p.userid))];
+        let females = [...players.filter((p) => p.gender === "F" && !restReady.some(r => r.userid === p.userid))];
+
+        //섞기
+        rmales = shuffle(rmales);
+        rfemales = shuffle(rfemales); 
         males = shuffle(males);
         females = shuffle(females);
 
-        //화면에 뿌려짐 배열 초기화
-        const newCourts: Player[][] = [];
+        //전에 안친 사람들 우선권 주기
+        males.unshift(...rmales);
+        females.unshift(...rfemales);
 
+        let rest: Player[] = [];
+        let localMatchingCount = matchingcount;
+        let sumMf:any[] = [];
+        let sumRmf :any[] = [];
+        let arr :any[] = [];
+
+        //매칭
         for (let i = 0; i < courtCount; i++) {
             const group: Player[] = [];
 
             // 우선 2M 2F 조합
-            if (males.length >= 2 && females.length >= 2) {
+            if (males.length >= 2 && females.length >= 2 && localMatchingCount < 3) {
                 group.push(...males.splice(0, 2));
                 group.push(...females.splice(0, 2));
+
+                localMatchingCount++;
             }
-            // 3M 1F
-            else if (males.length >= 3 && females.length >= 1) {
-                group.push(...males.splice(0, 3));
-                group.push(...females.splice(0, 1));
+            // 남복
+            else if (males.length >= 4) {
+                localMatchingCount++;
+                group.push(...males.splice(0, 4));
             }
-            // 1M 3F
-            else if (females.length >= 3 && males.length >= 1) {
-                group.push(...females.splice(0, 3));
-                group.push(...males.splice(0, 1));
+            // 여복
+            else if (females.length >= 4) {
+                localMatchingCount++;
+                group.push(...females.splice(0, 4));
             }
             // 안 되면 그냥 4명
             else {
-                const leftover = [...males, ...females];
-                if (leftover.length < 4) break; // 팀 불가 시 종료
-                group.push(...leftover.splice(0, 4));
+                arr = [];
+                sumMf = [...males,...females];
+                sumRmf = [...rfemales, ...rmales];
+
+                sumRmf = shuffle(sumRmf);
+                sumMf = shuffle(sumMf);
+
+                if (males.length + females.length < 4) break; // 팀 불가 시 종료
+                localMatchingCount = 0;
+
+                while (arr.length !== 4 && (sumRmf.length > 0 || sumMf.length > 0)) {
+                    //우선순위 뽑힐때까지 뽑기
+                    if(sumRmf.length){
+                        let grap: any = sumRmf.splice(0,1)[0];
+                        arr.push(grap);
+
+                        //빼기
+                        males = [...males.filter(m=> m.userid !== grap.userid)];
+                        females = [...females.filter(m=> m.userid !== grap.userid)];
+                        sumMf = [...sumMf.filter(m=> m.userid !== grap.userid)];
+
+                    }else {
+                        let grap: any = sumMf.splice(0,1)[0];
+                        arr.push(grap);
+
+                        //빼기
+                        males = [...males.filter(m=> m.userid !== grap.userid)];
+                        females = [...females.filter(m=> m.userid !== grap.userid)];
+                    }
+
+                }
+
+                group.push(...arr.splice(0));
             }
 
             newCourts.push(group);
-
-            //뽑힌 사람은 삭제
-            group.find((p) => {
-                males = males.filter(m => m !== p)
-                females = females.filter(f => f !== p)
-            })
         }
 
+        //섞기
+        newCourts = shuffle2A(newCourts, 4);
+        console.log("newCourts", newCourts);
+
         // 남는 사람들은 쉬는 타임
-        const rest: Player[] = [...males, ...females];
+        rest = [...males,...females];
+        console.log("rest2", rest);
 
 
-        socket.emit("matching", roomid, newCourts, rest);
+        socket.emit("matching", roomid, newCourts, rest, localMatchingCount);
+
+        //ready 안누른 사람들
+        rest = [...rest, ...noReady];
+
 
         //대기열 플레이어 비우기
-        socket.emit("emptyready", roomid);
+        // socket.emit("emptyready", roomid);
     }
 
     //대기열 플레이어
@@ -171,15 +254,13 @@ export default function GameRoom() {
 
         //중복방지
         if (ready && isAlreadyReady) {
-            let newready = [...ready.filter((r) => r.userid !== userid)]
-            setReady(newready);
             socket.emit("notready", roomid, userid);
         }
         else {
             socket.emit("ready", roomid, userid);
         };
 
-        setisAlreadyReady(!isAlreadyReady);
+        // setisAlreadyReady(!isAlreadyReady);
     };
 
 
@@ -253,7 +334,7 @@ export default function GameRoom() {
                 <button
                     type="button"
                     disabled={!isAlreadyReady}
-                    onClick={() => ready? matchPlayers(ready, courtCount): null}
+                    onClick={() => ready ? matchPlayers(ready, courtCount) : null}
                     className={`px-6 py-2 rounded-lg font-semibold transition
                 ${isAlreadyReady
                             ? "bg-indigo-600 text-white hover:bg-indigo-700"
@@ -295,20 +376,23 @@ export default function GameRoom() {
             <div className={courts ? "bg-white rounded-xl shadow p-5 space-y-4" : "hidden"}>
                 <h2 className="text-xl font-semibold">매칭 결과</h2>
 
-                {courts?.map((court, idx) => (
-                    <div key={idx} className="border rounded-lg p-3">
-                        <h3 className="font-semibold mb-2 text-indigo-600">
-                            Court {idx + 1}
-                        </h3>
-                        <ul className="space-y-1">
-                            {court.map((p) => (
-                                <li key={p.userid}>
-                                    {p.name} ({p.gender})
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
+                <div className="flex w-[50%]">
+                    {courts?.map((court, idx) => (
+                        <div key={idx} className="border rounded-lg p-3 w-[100%]">
+                            <h3 className="font-semibold mb-2 text-indigo-600">
+                                코트 {idx + 1}
+                            </h3>
+                            <ul className="space-y-1">
+                                {court.map((p) => (
+                                    <li key={p.userid}>
+                                        {p.name} ({p.gender})
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+
 
                 <div className="border rounded-lg p-3 bg-gray-50">
                     <h3 className="font-semibold mb-2">

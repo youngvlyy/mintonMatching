@@ -2,12 +2,13 @@ import React, { useState } from 'react'
 
 interface MakeRoomP {
     close: () => void;
-    addRoom : (tit: string) => void;
+    addRoom : (tit: string) => any;
+    inRoom : (id:string,tit: string) => void;
 }
 
-export default function MakeRoom({ close, addRoom }: MakeRoomP) {
+export default function MakeRoom({ close, addRoom, inRoom }: MakeRoomP) {
     const[value, setvalue] = useState("");
-
+    
 // 방 만들기
     return (
         <div>
@@ -26,7 +27,7 @@ export default function MakeRoom({ close, addRoom }: MakeRoomP) {
                             닫기
                         </button>
                         <button
-                            onClick={() => {addRoom(value); close();}}
+                            onClick={async() => {const{_id,title} = await addRoom(value); console.log(_id);  inRoom(_id, title); close(); }}
                             className="px-4 py-2 ml-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
                         >
                             만들기
