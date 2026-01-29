@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import MakeRoom from "./MakeRoom";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { socket } from "../util/socket";
+import Popup from "../component/Popup";
+import type { PopupMode } from "../component/type/config";
 
 interface Room {
     _id: string;
@@ -15,7 +16,7 @@ const Main = () => {
     const [openPopup, setOpenPopup] = useState(false);
     const [searchparams] = useSearchParams();//쿼리스트링
     const userid = searchparams.get("user");//유저 쿼리스트링
-
+    const mode:PopupMode = "roomMake";
 
     //db에서 room 정보 불러오고 리스트에 뿌리기
     useEffect(() => {
@@ -77,6 +78,11 @@ const Main = () => {
         navigate(`/gameroom/${id}/${tit}?user=${userid}`);
     }
 
+    //마이페이지 으로 들어가기
+    const Mypage = () => {
+        navigate(`/mypage?user=${userid}`);
+    }
+
     // 검색된 방만 표시
     const filteredRooms = rooms.filter(room =>
         room.title.toLowerCase().includes(search.toLowerCase())
@@ -91,7 +97,8 @@ const Main = () => {
                 </h1>
                 <div className="flex gap-2">
                     <button className="px-3 py-1.5 text-sm border border-gray-300
-                                   rounded-lg hover:bg-gray-100 transition">
+                                   rounded-lg hover:bg-gray-100 transition"
+                            onClick={() => Mypage()}>
                         마이페이지
                     </button>
                     <button
@@ -154,7 +161,8 @@ const Main = () => {
 
 
             {openPopup && (
-                <MakeRoom
+                <Popup
+                    mode={mode}
                     close={() => setOpenPopup(false)}
                     addRoom={(tit) => addRoom(tit)}
                     inRoom ={(id,tit)=> inRoom(id,tit)}

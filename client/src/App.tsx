@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/SignUp";
 import Main from "./pages/Main";
 import GameRoom from "./pages/GameRoom"
+import Mypage from "./pages/Mypage";
+import Postuser from "./pages/Postuser";
 
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
           <>
             {/* 로그인 된 상태면 홈 페이지 접근 */}
             <Route path="/" element={<Main/>} />
+            <Route path="/mypage" element={<Mypage/>} />
+            <Route path="/postuser" element={<Postuser/>} />
             <Route path="/gameroom/:roomid/:roomtit" element={<GameRoom/>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>

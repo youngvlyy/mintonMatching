@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { socket } from "../util/socket"
+import Header from "../component/Header";
 
 interface Player {
     userid: string;
@@ -269,20 +270,7 @@ export default function GameRoom() {
     return (
         <div className="max-w-3xl mx-auto p-6 space-y-6">
             {/* 헤더 */}
-            <div className="relative flex items-center justify-center">
-                <button
-                    type="button"
-                    onClick={exit}
-                    className="absolute left-0 px-3 py-1 text-sm border rounded-lg hover:bg-gray-100"
-                >
-                    뒤로
-                </button>
-
-                <h1 className="text-2xl font-bold">
-                    {roomtit}
-                </h1>
-            </div>
-
+            <Header exit={exit} title={roomtit}/>
             {/* Court Count */}
             <div className="flex items-center justify-center gap-6 bg-gray-50 p-4 rounded-xl">
                 <button
