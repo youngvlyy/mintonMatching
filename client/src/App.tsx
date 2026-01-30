@@ -15,6 +15,11 @@ function App() {
     return <div>Loading...</div>; 
   }
 
+  // const token = localStorage.getItem("token");
+
+  // if (!token) {
+  //   return <Navigate to="/login" replace />;
+  // }
 
   return (
     <BrowserRouter>
@@ -29,10 +34,10 @@ function App() {
         ) : (
           <>
             {/* 로그인 된 상태면 홈 페이지 접근 */}
-            <Route path="/" element={<Main/>} />
-            <Route path="/mypage" element={<Mypage/>} />
+            <Route path="/" element={<Main userid={user}/>} />
+            <Route path="/mypage" element={<Mypage userid={user}/>} />
             <Route path="/postuser" element={<Postuser/>} />
-            <Route path="/gameroom/:roomid/:roomtit" element={<GameRoom/>} />
+            <Route path="/gameroom/:roomid/:roomtit" element={<GameRoom userid={user}/>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}

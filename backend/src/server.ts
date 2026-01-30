@@ -3,8 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "./models";
 import { Room } from "./models";
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
-import { error } from "console";
+import {authToken} from "./midldleware/authToken"
 
 const router = express.Router();
 
@@ -83,7 +82,6 @@ router.post("/room", async (req, res) => {
 
 //방 정보 얻기(id, title, favorite)
 router.get("/room", async (req, res) => {
-
     try {
         const rooms = await Room.find();
         res.json(rooms);
@@ -134,6 +132,26 @@ router.patch("/user/:userid", async (req, res) => {
     }
 
 });
+
+//개인정보 삭제
+router.delete("/user/:userid", async (req, res) => {
+    const { userid } = req.params;
+    try {
+
+        await User.deleteOne(
+            { userid }
+        );
+
+
+        res.json({success:true, message:"탈퇴되었습니다 ㅠ"});
+
+    } catch (err: any) {
+        console.error(err);
+        return res.status(500).json({ success: false, error: "서버 오류" });
+    }
+
+});
+
 
 //비밀번호 변경
 router.patch("/userpasswardauth/:userid", async (req, res) => {

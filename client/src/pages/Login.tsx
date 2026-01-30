@@ -15,7 +15,7 @@ export default function Login() {
 
     localStorage.setItem("token", res.data.token);
     alert("로그인 성공!");
-    window.location.href = `/?user=${userid}`;    
+    window.location.href = `/`;    
   } catch (err:any) {
     alert(err.response?.data?.message || err.message);
   }

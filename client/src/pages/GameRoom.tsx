@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { socket } from "../util/socket"
-import Header from "../component/Header";
+import {Header} from "../component/Header";
 
 interface Player {
     userid: string;
@@ -9,12 +9,16 @@ interface Player {
     gender: "M" | "F";
 }
 
-export default function GameRoom() {
+interface GameRoomP{
+    userid:string;
+}
+
+export default function GameRoom({userid}:GameRoomP) {
     const navigate = useNavigate();
     const [courtCount, setCourtCount] = useState(3);
     const { roomid, roomtit } = useParams();
-    const [searchparams] = useSearchParams();
-    const userid = searchparams.get("user");
+    // const [searchparams] = useSearchParams();
+    // const userid = searchparams.get("user");
     console.log(userid);
     const [courts, setCourts] = useState<Player[][] | null>(null);
     const [resting, setResting] = useState<Player[]>([]);
@@ -100,7 +104,7 @@ export default function GameRoom() {
 
     const exit = () => {
         socket.emit("leaveRoom", roomid, userid);
-        navigate(`/?user=${userid}`);
+        navigate(`/`);
     }
 
     //참여자들 랜덤하게 섞는 함수

@@ -4,18 +4,11 @@ import type { PopupMode } from './type/config';
 
 interface PopupP{
     mode: PopupMode;
-    // userid : string;
     close : ()=>void;
     auth?: (password: string) => void;
     addRoom?: (tit: string) => Promise<{ _id: string; title: string }>;
     inRoom?: (id: string, tit: string) => void;   
-   // config : config;
 }
-// interface config{
-//     header : string;
-//     placeholder: string;
-//     button1 : string;
-// }
 
 export default function Popup({mode, auth, close, addRoom, inRoom }:PopupP) {
     const[value, setvalue] = useState("");
@@ -52,7 +45,7 @@ export default function Popup({mode, auth, close, addRoom, inRoom }:PopupP) {
                                     close();
                                 }
                             }}
-                            className="px-4 py-2 ml-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                            className="px-4 py-2 ml-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                         >
                             {config.btn}
                         </button>

@@ -2,14 +2,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import Header from "../component/Header";
+import { Header } from "../component/Header";
 import Popup from "../component/Popup";
 import type { PopupMode } from '../component/type/config';
 
-const Mypage: React.FC = () => {
+interface MypageP {
+    userid: string;
+}
+
+const Mypage = ({ userid }: MypageP) => {
     const navigate = useNavigate(); // 페이지 이동 훅
-    const [searchparams] = useSearchParams();
-    const userid: any = searchparams.get("user");
+    // const [searchparams] = useSearchParams();
+    // const userid: any = searchparams.get("user");
     const [name, setName] = useState("");
     const [gender, setGender] = useState("");
     const inputRefName = useRef<HTMLInputElement>(null);
@@ -17,9 +21,9 @@ const Mypage: React.FC = () => {
     const [namePost, setNamePost] = useState(false);
     const [genderPost, setgenderPost] = useState(false);
     const [openPopup, setopenPopup] = useState(false);
-    const [mode, setmode] = useState<PopupMode>("password-auth") ;
+    const [mode, setmode] = useState<PopupMode>("password-auth");
 
-    
+
 
     const auth = (password: string) => {
         if (mode === "password-auth") {
@@ -64,7 +68,7 @@ const Mypage: React.FC = () => {
         });
     }
     const exit = () => {
-        navigate(`/?user=${userid}`);
+        navigate(`/`);
     }
 
     //수정 가능
@@ -72,6 +76,21 @@ const Mypage: React.FC = () => {
         if (Post) {
             inputref.current?.focus();
         }
+    }
+
+    //회원 탈퇴
+    const userDel = async () => {
+        await axios.delete(`api/user/${userid}`).then(res => {
+            if (res.data.success) {
+                alert(res.data.message);
+                localStorage.removeItem("token"); // 토큰 삭제
+                window.location.reload();
+            }
+            else {
+                alert(res.data.error);
+            }
+        })
+
     }
 
 
@@ -114,7 +133,7 @@ const Mypage: React.FC = () => {
                                     setNamePost(true)
                                 }
                             }}
-                                className="ml-3 p-2 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">{namePost ? "확인" : "수정"}</button>
+                                className={`editBtn ${namePost ? "on" : null}`}>{namePost ? "확인" : "수정"}</button>
                         </div>
                     </div>
 
@@ -164,7 +183,7 @@ const Mypage: React.FC = () => {
                                 }
 
                             }}
-                                className="ml-3 p-2 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">{genderPost ? "확인" : "수정"}</button>
+                                className={`editBtn ${genderPost ? "on" : null}`}>{genderPost ? "확인" : "수정"}</button>
                         </div>
                     </div>
 
@@ -178,14 +197,23 @@ const Mypage: React.FC = () => {
                             비밀번호 변경
                         </button>
                     </div>
+                    <div className="flex justify-end">
+                        <button
+                            type="button"
+                            onClick={() => userDel()}
+                            className="text-sm text-gray-400 hover:underline"
+                        >
+                            회원탈퇴
+                        </button>
+                    </div>
                 </div>
             </div>
 
             {openPopup && (
-                <Popup 
-                mode = {mode}
-                auth = {auth}
-                close={() => setopenPopup(false)} 
+                <Popup
+                    mode={mode}
+                    auth={auth}
+                    close={() => setopenPopup(false)}
                 />
             )}
         </div>

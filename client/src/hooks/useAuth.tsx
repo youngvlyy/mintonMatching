@@ -26,6 +26,7 @@ export const useAuth = () => {
         localStorage.removeItem("token");
         setUser(null);
         setLoading(false);
+        window.location.reload();
         return;
       }
 
@@ -36,6 +37,7 @@ export const useAuth = () => {
       const timer = setTimeout(() => {
         localStorage.removeItem("token");
         setUser(null);
+        window.location.reload();
       }, expireTime);
 
       return () => clearTimeout(timer);
