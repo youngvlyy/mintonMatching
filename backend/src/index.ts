@@ -31,7 +31,7 @@ initSocket(server);
 const PORT = 4000;
 
 if (!process.env.MONGO_URI) {
-  console.error("MONGO_URI is not defined!");
+  console.error("몽고db uri 없음");
   process.exit(1); // 아예 서버 실행 중단
 }
 
