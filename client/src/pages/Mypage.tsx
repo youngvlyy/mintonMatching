@@ -1,6 +1,6 @@
 // src/pages/Signup.tsx
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Header } from "../component/Header";
 import Popup from "../component/Popup";

@@ -10,10 +10,7 @@ interface Room {
     _id: string;
     title: string;
 }
-interface MainP{
-    userid:string;
-}
-const Main = ({userid}:MainP) => {
+const Main = () => {
     const navigate = useNavigate();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [search, setSearch] = useState("");
@@ -86,7 +83,7 @@ const Main = ({userid}:MainP) => {
     return (
         <div className="max-w-xl mx-auto min-h-screen bg-gray-50 px-4 py-6">
             {/* 헤더 */}
-            <MainHeader userid={userid} />
+            <MainHeader />
 
             {/* 검색 */}
             <div className="mb-5">

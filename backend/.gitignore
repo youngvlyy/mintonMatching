@@ -1,3 +1,5 @@
 node_modules
 src/firebase/serviceAccountKey.json
 .env
+*.pem
+*.key

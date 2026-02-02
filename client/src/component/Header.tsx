@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
 
 interface BackbtnP {
     exit: () => void;
@@ -27,10 +25,7 @@ export function Header({ exit, title }: BackbtnP) {
     )
 }
 
-interface MainHeaderP{
-    userid : string | null;
-}
-export function MainHeader({ userid }:MainHeaderP) {
+export function MainHeader() {
     const navigate = useNavigate();
 
     //마이페이지 으로 들어가기
