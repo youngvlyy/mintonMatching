@@ -28,7 +28,7 @@ app.use("/api", server_1.default);
 (0, websocket_1.initSocket)(server);
 const PORT = 4000;
 if (!process.env.MONGO_URI) {
-    console.error("MONGO_URI is not defined!");
+    console.error("몽고db uri 없음");
     process.exit(1); // 아예 서버 실행 중단
 }
 mongoose_1.default.connect(process.env.MONGO_URI)

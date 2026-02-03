@@ -9,8 +9,9 @@ const models_1 = require("./models");
 const redis_1 = __importDefault(require("./redis"));
 const initSocket = (server) => {
     const io = new socket_io_1.Server(server, {
+        path: "/api/socket.io",
         cors: {
-            origin: "*",
+            origin: "http://mintonminchin.shop",
             methods: ["GET", "POST"],
             credentials: true,
         },
