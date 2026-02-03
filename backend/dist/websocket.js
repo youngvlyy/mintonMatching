@@ -11,7 +11,7 @@ const initSocket = (server) => {
     const io = new socket_io_1.Server(server, {
         path: "/api/socket.io",
         cors: {
-            origin: "http://mintonminchin.shop",
+            origin: "https://mintonminchin.shop",
             methods: ["GET", "POST"],
             credentials: true,
         },

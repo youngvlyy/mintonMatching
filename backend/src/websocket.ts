@@ -6,7 +6,7 @@ export const initSocket = (server: any) => {
   const io = new Server(server, {
     path:"/api/socket.io",
     cors: {
-      origin: "http://mintonminchin.shop",
+      origin: "https://mintonminchin.shop",
       methods: ["GET", "POST"],
       credentials: true,
     },
