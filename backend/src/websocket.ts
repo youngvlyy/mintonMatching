@@ -4,8 +4,9 @@ import redis from "./redis";
 
 export const initSocket = (server: any) => {
   const io = new Server(server, {
+    path:"/api/socket.io",
     cors: {
-      origin: "*",
+      origin: "http://mintonminchin.shop",
       methods: ["GET", "POST"],
       credentials: true,
     },
