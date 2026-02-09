@@ -68,98 +68,113 @@ const Signup: React.FC = () => {
 
 
     return (
-        <div className="w-full min-h-screen flex items-center justify-center bg-gray-100">
-            <form
-                onSubmit={handleSubmit}
-                className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm"
-            >
-                <h2 className="text-2xl font-bold mb-6 text-center">회원가입</h2>
+  <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm w-full max-w-sm"
+    >
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+        회원가입
+      </h2>
 
-                {/* 이름 */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 mb-2">이름</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="이름 입력"
-                        required
-                    />
-                </div>
+      {/* 이름 */}
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-2 text-sm">이름</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full px-4 py-3 text-sm border border-gray-300 rounded-xl
+                     focus:outline-none focus:ring-1 focus:ring-blue-400"
+          placeholder="이름 입력"
+          required
+        />
+      </div>
 
-                {/* 성별 */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 mb-2">성별</label>
-                    <div className="flex">
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="radio"
-                                name="gender"
-                                value="M"
-                                checked={gender === "M"}
-                                onChange={(e) => setGender(e.target.value)}
-                                className="accent-blue-500"
-                                required
-                            />
-                            남자
-                        </label>
+      {/* 성별 */}
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-2 text-sm">성별</label>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="gender"
+              value="M"
+              checked={gender === "M"}
+              onChange={(e) => setGender(e.target.value)}
+              className="accent-blue-500"
+              required
+            />
+            남자
+          </label>
 
-                        <label className="flex ml-2 items-center gap-2">
-                            <input
-                                type="radio"
-                                name="gender"
-                                value="F"
-                                checked={gender === "F"}
-                                onChange={(e) => setGender(e.target.value)}
-                                className="accent-pink-500"
-                            />
-                            여자
-                        </label>
-                    </div>
-
-                </div>
-
-                {/* 아이디 */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 mb-2">아이디</label>
-                    <div className="w-full flex justify-between">
-                        <input
-                            type="text"
-                            value={userid}
-                            onChange={(e) => setUserid(e.target.value)}
-                            className={`flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${!overlapck ? "border-red-500 border-spacing-48" : "border-gray-300"}`}
-                            placeholder="아이디 입력"
-                            required
-                        />
-                        <button type="button" onClick={overlapCheck} className="ml-3 p-2 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">중복확인</button>
-                    </div>
-
-                </div>
-
-                {/* 비밀번호 */}
-                <div className="mb-6">
-                    <label className="block text-gray-700 mb-2">비밀번호</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="비밀번호 입력"
-                        required
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    onClick={allck}
-                    className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
-                >
-                    회원가입
-                </button>
-            </form>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="gender"
+              value="F"
+              checked={gender === "F"}
+              onChange={(e) => setGender(e.target.value)}
+              className="accent-pink-400"
+            />
+            여자
+          </label>
         </div>
-    );
+      </div>
+
+      {/* 아이디 */}
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-2 text-sm">아이디</label>
+        <div className="w-full flex">
+          <input
+            type="text"
+            value={userid}
+            onChange={(e) => setUserid(e.target.value)}
+            className={`flex-1 px-4 py-3 text-sm rounded-xl border
+              focus:outline-none focus:ring-1 focus:ring-blue-400
+              ${!overlapck ? "border-red-400" : "border-gray-300"}`}
+            placeholder="아이디 입력"
+            required
+          />
+          <button
+            type="button"
+            onClick={overlapCheck}
+            className="ml-3 px-4 py-3 text-sm rounded-xl
+                       bg-indigo-500 text-white
+                       hover:bg-indigo-600 transition"
+          >
+            중복확인
+          </button>
+        </div>
+      </div>
+
+      {/* 비밀번호 */}
+      <div className="mb-6">
+        <label className="block text-gray-700 mb-2 text-sm">비밀번호</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-4 py-3 text-sm border border-gray-300 rounded-xl
+                     focus:outline-none focus:ring-1 focus:ring-blue-400"
+          placeholder="비밀번호 입력"
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        onClick={allck}
+        className="w-full py-3 rounded-xl text-sm font-medium
+                   bg-indigo-500 text-white
+                   hover:bg-indigo-600 transition"
+      >
+        회원가입
+      </button>
+    </form>
+  </div>
+);
+
 };
 
 export default Signup;
