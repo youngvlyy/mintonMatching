@@ -76,7 +76,7 @@ export default function GameRoom({userid}:GameRoomP) {
 
 
         socket.on("matchingPlayers", (matching) => {
-            setCourts(matching.courts);
+            setCourts(matching?.courts);
             setResting(matching.resting);
             setMatchingcount(matching.matchingcount);
             console.log("matchingcount", matchingcount);
