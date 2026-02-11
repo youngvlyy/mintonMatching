@@ -130,6 +130,7 @@ export const initSocket = (server: any) => {
         await redis.del(roomkey);
         console.log("방 삭제됨:", roomid);
         io.emit("roomupdate");
+        socket.emit("ex"); //로그인화면
       } else {
         io.to(roomid).emit("readyPlayers", readyPlayers);
         io.to(roomid).emit("outupdatePlayer", Players);
@@ -154,6 +155,7 @@ export const initSocket = (server: any) => {
         const roomkey = `room:${roomid}`;
         const readykey = `room:${roomid}:ready`;
         const isreadykey = `room:${roomid}:isready`;
+        let roomremove = false;
 
         // 현재 플레이어 전체
         const PlayersRaw = await redis.hGetAll(roomkey);
@@ -189,6 +191,9 @@ export const initSocket = (server: any) => {
               await Room.findByIdAndDelete(roomid);
               await redis.del(roomkey);
               console.log("방 삭제됨:", roomid);
+              roomremove = true;
+              
+              io.emit("roomupdate");
             } else {
               io.to(roomid).emit("readyPlayers", readyPlayers);
               io.to(roomid).emit("outupdatePlayer", Players);

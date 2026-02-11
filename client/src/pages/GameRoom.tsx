@@ -85,6 +85,10 @@ export default function GameRoom({userid}:GameRoomP) {
             alert(message);
         });
 
+        socket.on("ex",()=>{
+            navigate(`/`);
+        })
+
 
         // 새로고침 / 탭 닫기
         window.addEventListener("beforeunload", handleUnload);

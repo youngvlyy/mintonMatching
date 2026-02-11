@@ -3,3 +3,4 @@ src/firebase/serviceAccountKey.json
 .env
 *.pem
 *.key
+dist
