@@ -131,6 +131,7 @@ export const initSocket = (server: any) => {
         console.log("방 삭제됨:", roomid);
         io.emit("roomupdate");
         socket.emit("ex"); //로그인화면
+        
       } else {
         io.to(roomid).emit("readyPlayers", readyPlayers);
         io.to(roomid).emit("outupdatePlayer", Players);
