@@ -7,20 +7,21 @@ interface BackbtnP {
 
 export function Header({ exit, title }: BackbtnP) {
     return (
-        <div>
-            <div className="relative flex items-center justify-center">
-                <button
-                    type="button"
-                    onClick={() => exit()}
-                    className="absolute left-0 px-3 py-1 text-sm border rounded-lg hover:bg-gray-100"
-                >
-                    뒤로
-                </button>
-                <h1 className="text-2xl font-bold">
-                    {title}
-                </h1>
-            </div>
-
+        <div className="relative flex items-center justify-center py-1 mb-2">
+            <button
+                type="button"
+                onClick={() => exit()}
+                className="absolute left-0 flex items-center gap-1 px-3 py-1.5 text-sm text-slate-500
+                           border border-slate-200 rounded-xl hover:bg-slate-50 transition active:scale-95"
+            >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+                뒤로
+            </button>
+            <h1 className="text-lg font-bold text-slate-900">
+                {title}
+            </h1>
         </div>
     )
 }
@@ -28,12 +29,10 @@ export function Header({ exit, title }: BackbtnP) {
 export function MainHeader() {
     const navigate = useNavigate();
 
-    //마이페이지 으로 들어가기
     const Mypage = () => {
         navigate(`/mypage`);
     }
 
-    //로그아웃
     const logout = () => {
         localStorage.removeItem("token");
         window.location.reload();
@@ -41,19 +40,26 @@ export function MainHeader() {
 
     return (
         <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-semibold text-gray-900">
-                배드민턴 방 목록
-            </h1>
+            <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center shadow-sm">
+                    <span className="text-white text-sm">🏸</span>
+                </div>
+                <h1 className="text-lg font-bold text-slate-900">
+                    MintonMatch
+                </h1>
+            </div>
             <div className="flex gap-2">
-                <button className="px-3 py-1.5 text-sm border border-gray-300
-                                   rounded-lg hover:bg-gray-100 transition"
-                    onClick={() => Mypage()}>
+                <button
+                    onClick={() => Mypage()}
+                    className="px-3 py-1.5 text-sm font-medium border border-slate-200
+                               rounded-xl hover:bg-slate-50 transition text-slate-600 active:scale-95"
+                >
                     마이페이지
                 </button>
                 <button
                     onClick={logout}
-                    className="px-3 py-1.5 text-sm border border-red-300
-                               text-red-500 rounded-lg hover:bg-red-50 transition"
+                    className="px-3 py-1.5 text-sm font-medium border border-red-200
+                               text-red-500 rounded-xl hover:bg-red-50 transition active:scale-95"
                 >
                     로그아웃
                 </button>
