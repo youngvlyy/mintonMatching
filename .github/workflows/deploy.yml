@@ -62,7 +62,6 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo cp ~/minton-matching/nginx/minton-matching.conf /etc/nginx/sites-available/minton-matching
-            sudo ln -sf /etc/nginx/sites-available/minton-matching /etc/nginx/sites-enabled/minton-matching
+            sudo cp ~/minton-matching/nginx/minton-matching.conf /etc/nginx/conf.d/minton-matching.conf
             sudo nginx -t && sudo nginx -s reload
             pm2 restart all
