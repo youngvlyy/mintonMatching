@@ -50,7 +50,7 @@ router.post("/login", async (req, res) => {
     if (!user)
         return res.status(400).json({ message: "존재하지 않는 아이디입니다." });
 
-    const isMatch = await bcrypt.compare(password, user.password); //원본 비번과 해시비번 비교
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
         return res.status(400).json({ message: "비밀번호가 올바르지 않습니다." });
 
@@ -58,7 +58,37 @@ router.post("/login", async (req, res) => {
         expiresIn: "3h",
     });
 
-    res.json({ success: true, token });
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 3 * 60 * 60 * 1000,
+    });
+
+    res.json({ success: true, userid: user.userid });
+});
+
+// 현재 로그인 상태 확인
+router.get("/me", (req: any, res) => {
+    const token = req.cookies?.token;
+    if (!token) return res.status(401).json({ error: "인증 필요" });
+
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as any;
+        res.json({ userid: decoded.userid });
+    } catch {
+        res.status(401).json({ error: "유효하지 않은 토큰" });
+    }
+});
+
+// 로그아웃
+router.post("/logout", (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    res.json({ success: true });
 });
 
 //방 만들기

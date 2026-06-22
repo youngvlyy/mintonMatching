@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import userRouter from "./server";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
@@ -13,10 +14,16 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = ["https://mintonminchin.shop", "http://localhost:5173"];
+
 app.use(cors({
-  origin: "*",
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) callback(null, true);
+    else callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
 }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

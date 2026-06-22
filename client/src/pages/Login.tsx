@@ -1,23 +1,25 @@
-// src/pages/Login.tsx
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import AuthLayout from "../component/AuthLayout";
+import { useAuthContext } from "../context/AuthContext";
 
 export default function Login() {
     const [userid, setUserid] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const { setUser } = useAuthContext();
+    const navigate = useNavigate();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         try {
             const res = await axios.post("/api/login", { userid, password });
-            localStorage.setItem("token", res.data.token);
-            alert("로그인 성공!");
-            window.location.href = `/`;
+            setUser(res.data.userid);
+            navigate("/");
         } catch (err: any) {
-            alert(err.response?.data?.message || err.message);
+            setError(err.response?.data?.message || err.message);
         }
     };
 

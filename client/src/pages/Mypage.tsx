@@ -5,6 +5,7 @@ import axios from "axios";
 import { Header } from "../component/Header";
 import Popup from "../component/Popup";
 import type { PopupMode } from '../component/type/config';
+import { useAuthContext } from "../context/AuthContext";
 
 interface MypageP {
     userid: string;
@@ -12,6 +13,7 @@ interface MypageP {
 
 const Mypage = ({ userid }: MypageP) => {
     const navigate = useNavigate();
+    const { setUser } = useAuthContext();
     const [name, setName] = useState("");
     const [gender, setGender] = useState("");
     const inputRefName = useRef<HTMLInputElement>(null);
@@ -65,11 +67,11 @@ const Mypage = ({ userid }: MypageP) => {
         }
     }
     const userDel = async () => {
-        await axios.delete(`api/user/${userid}`).then(res => {
+        await axios.delete(`api/user/${userid}`).then(async res => {
             if (res.data.success) {
                 alert(res.data.message);
-                localStorage.removeItem("token");
-                window.location.reload();
+                await axios.post("/api/logout");
+                setUser(null);
             } else {
                 alert(res.data.error);
             }

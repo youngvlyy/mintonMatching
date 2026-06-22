@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuthContext } from '../context/AuthContext';
 
 interface BackbtnP {
     exit: () => void;
@@ -28,14 +30,11 @@ export function Header({ exit, title }: BackbtnP) {
 
 export function MainHeader() {
     const navigate = useNavigate();
+    const { setUser } = useAuthContext();
 
-    const Mypage = () => {
-        navigate(`/mypage`);
-    }
-
-    const logout = () => {
-        localStorage.removeItem("token");
-        window.location.reload();
+    const logout = async () => {
+        await axios.post("/api/logout");
+        setUser(null);
     };
 
     return (
@@ -50,7 +49,7 @@ export function MainHeader() {
             </div>
             <div className="flex gap-2">
                 <button
-                    onClick={() => Mypage()}
+                    onClick={() => navigate('/mypage')}
                     className="px-3 py-1.5 text-sm font-medium border border-slate-200
                                rounded-xl hover:bg-slate-50 transition text-slate-600 active:scale-95"
                 >
